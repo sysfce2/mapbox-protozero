@@ -153,7 +153,7 @@ TEST_CASE("write repeated packed field using packed field: " PBF_TYPE_NAME) {
 
     SECTION("empty - should do rollback") {
         {
-            packed_field_type field{pw, 1};
+            const packed_field_type field{pw, 1};
         }
 
         REQUIRE(buffer == load_data("repeated_packed_" PBF_TYPE_NAME "/data-empty"));
@@ -162,7 +162,7 @@ TEST_CASE("write repeated packed field using packed field: " PBF_TYPE_NAME) {
     SECTION("one") {
         {
             packed_field_type field{pw, 1};
-            field.add_element(cpp_type(17));
+            field.add_element(static_cast<cpp_type>(17));
         }
 
         REQUIRE(buffer == load_data("repeated_packed_" PBF_TYPE_NAME "/data-one"));
@@ -171,14 +171,14 @@ TEST_CASE("write repeated packed field using packed field: " PBF_TYPE_NAME) {
     SECTION("many") {
         {
             packed_field_type field{pw, 1};
-            field.add_element(cpp_type(  17));
-            field.add_element(cpp_type( 200));
-            field.add_element(cpp_type(   0));
-            field.add_element(cpp_type(   1));
+            field.add_element(static_cast<cpp_type>(  17));
+            field.add_element(static_cast<cpp_type>( 200));
+            field.add_element(static_cast<cpp_type>(   0));
+            field.add_element(static_cast<cpp_type>(   1));
             field.add_element(std::numeric_limits<cpp_type>::max());
 #if PBF_TYPE_IS_SIGNED
-            field.add_element(cpp_type(-200));
-            field.add_element(cpp_type(  -1));
+            field.add_element(static_cast<cpp_type>(-200));
+            field.add_element(static_cast<cpp_type>(  -1));
             field.add_element(std::numeric_limits<cpp_type>::min());
 #endif
             REQUIRE(field.valid());
@@ -201,7 +201,7 @@ TEST_CASE("move repeated packed field: " PBF_TYPE_NAME) {
         REQUIRE_FALSE(field.valid());
         field = packed_field_type{pw, 1};
         REQUIRE(field.valid());
-        field.add_element(cpp_type(17));
+        field.add_element(static_cast<cpp_type>(17));
     }
 
     SECTION("explicit move") {
@@ -216,7 +216,7 @@ TEST_CASE("move repeated packed field: " PBF_TYPE_NAME) {
         REQUIRE_FALSE(field2.valid()); // NOLINT(hicpp-invalid-access-moved, bugprone-use-after-move)
         REQUIRE(field.valid());
 
-        field.add_element(cpp_type(17));
+        field.add_element(static_cast<cpp_type>(17));
     }
 
     SECTION("move constructor") {
@@ -227,7 +227,7 @@ TEST_CASE("move repeated packed field: " PBF_TYPE_NAME) {
         REQUIRE(field.valid());
         REQUIRE_FALSE(field2.valid()); // NOLINT(hicpp-invalid-access-moved, bugprone-use-after-move)
 
-        field.add_element(cpp_type(17));
+        field.add_element(static_cast<cpp_type>(17));
     }
 
     SECTION("swap") {
@@ -243,7 +243,7 @@ TEST_CASE("move repeated packed field: " PBF_TYPE_NAME) {
         REQUIRE(field.valid());
         REQUIRE_FALSE(field2.valid());
 
-        field.add_element(cpp_type(17));
+        field.add_element(static_cast<cpp_type>(17));
     }
 
     REQUIRE(buffer == load_data("repeated_packed_" PBF_TYPE_NAME "/data-one"));
@@ -264,7 +264,7 @@ TEST_CASE("write from different types of iterators: " PBF_TYPE_NAME) {
     }
 
     SECTION("from string") {
-        std::string data{"1 4 9 16 25"};
+        const std::string data{"1 4 9 16 25"};
         std::stringstream sdata{data};
 
 #if PBF_TYPE_IS_SIGNED
@@ -273,8 +273,8 @@ TEST_CASE("write from different types of iterators: " PBF_TYPE_NAME) {
         using test_type = uint32_t;
 #endif
 
-        std::istream_iterator<test_type> eod;
-        std::istream_iterator<test_type> it(sdata);
+        const std::istream_iterator<test_type> eod;
+        const std::istream_iterator<test_type> it(sdata);
 
         pw.ADD_TYPE(1, it, eod);
     }

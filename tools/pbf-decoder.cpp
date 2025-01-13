@@ -33,6 +33,8 @@ Call with --help/-h to see more options.
 #include <stdexcept>
 #include <string>
 
+namespace {
+
 std::string decode(const char* data, std::size_t len, const std::string& indent);
 
 // Try decoding as a nested message
@@ -41,7 +43,7 @@ bool decode_message(std::stringstream& out, const std::string& indent, const pro
         const auto nested = decode(view.data(), view.size(), indent + "  ");
         out << '\n' << nested;
         return true;
-    } catch (const protozero::exception&) {
+    } catch (const protozero::exception&) { // NOLINT(bugprone-empty-catch)
     }
     return false;
 }
@@ -67,7 +69,7 @@ bool decode_printable_string(std::stringstream& out, const protozero::data_view 
 bool decode_string(std::stringstream& out, const protozero::data_view view) {
     static constexpr const std::size_t max_string_length = 60;
 
-    std::string str{view.data(), std::min(view.size(), max_string_length)};
+    const std::string str{view.data(), std::min(view.size(), max_string_length)};
     out << '"';
 
     for (const auto c : str) {
@@ -106,7 +108,7 @@ bool decode_packed_double(std::stringstream& out, std::size_t size, protozero::p
     try {
         print_number_range(out, message.get_packed_double());
         return true;
-    } catch (const protozero::exception&) {
+    } catch (const protozero::exception&) { // NOLINT(bugprone-empty-catch)
     }
 
     return false;
@@ -120,7 +122,7 @@ bool decode_packed_float(std::stringstream& out, std::size_t size, protozero::pb
     try {
         print_number_range(out, message.get_packed_float());
         return true;
-    } catch (const protozero::exception&) {
+    } catch (const protozero::exception&) { // NOLINT(bugprone-empty-catch)
     }
 
     return false;
@@ -131,7 +133,7 @@ bool decode_packed_varint(std::stringstream& out, protozero::pbf_reader& message
     try {
         print_number_range(out, message.get_packed_int64());
         return true;
-    } catch (const protozero::exception&) {
+    } catch (const protozero::exception&) { // NOLINT(bugprone-empty-catch)
     }
 
     return false;
@@ -193,7 +195,7 @@ void print_help() {
 }
 
 std::string read_from_file(const char* filename) {
-    std::ifstream file{filename, std::ios::binary};
+    const std::ifstream file{filename, std::ios::binary};
     return std::string{std::istreambuf_iterator<char>(file.rdbuf()),
                        std::istreambuf_iterator<char>()};
 }
@@ -202,6 +204,8 @@ std::string read_from_stdin() {
     return std::string{std::istreambuf_iterator<char>(std::cin.rdbuf()),
                        std::istreambuf_iterator<char>()};
 }
+
+} // anonymous namespace
 
 int main(int argc, char* argv[]) {
     static struct option long_options[] = {
